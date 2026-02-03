@@ -38,7 +38,7 @@ namespace Labb4RJ
                     StudentMethods.PrintAllStudents(context);
                     break;
                 case 2:
-                    StaffMethods.PrintClasses(context);
+                    StudentMethods.PrintClasses(context);
                     break;
                 case 3:
                     //grades
@@ -59,7 +59,7 @@ namespace Labb4RJ
         }
         public static void BackToMainMessage()
         {
-            Console.WriteLine("\nTryck enter för att återgå till huvudmenyn.");
+            Console.WriteLine("\nTryck enter för att gå tillbaka <-");
         }
         public static void ExitMessage()
         {
@@ -142,7 +142,7 @@ namespace Labb4RJ
                             StaffUI(context);
                             break;
                         case 3:
-                            // Course
+                            SubjectMethods.ActiveSubjects(context);
                             break;
                         case 0:
                             ExitMessage();
