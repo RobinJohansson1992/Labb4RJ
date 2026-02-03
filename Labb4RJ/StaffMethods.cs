@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Labb4RJ
 {
-    internal class Functions
+    internal class StaffMethods
     {
         public static void RemoveStaff(Labb4Context context)
         {
@@ -113,74 +113,8 @@ namespace Labb4RJ
             }
 
             Console.WriteLine($"\n0. Tillbaka <-");
-            PrintStudentsByClass(context, allClasses);
+            StudentMethods.PrintStudentsByClass(context, allClasses);
         }
-        // Method that prints all students by class:
-        public static void PrintStudentsByClass(Labb4Context context, List<Class> allClasses)
-        {
-            bool running = true;
-
-            while (running)
-            {
-                int userInput;
-                if (!int.TryParse(Console.ReadLine(), out userInput))
-                {
-                    UI.ErrorMessage();
-                    Console.ReadKey();
-                    continue;
-                }
-                if (userInput == 0)
-                {
-                    running = false;
-                    continue;
-                }
-                if (userInput < 1 || userInput > allClasses.Count)
-                {
-                    UI.ErrorMessage();
-                    Console.ReadKey();
-                    continue;
-                }
-                Console.Clear();
-                var students = context.Students
-                    .Where(s => s.ClassId == userInput) // only print the students in chosen class
-                    .ToList();
-                foreach (var s in students)
-                {
-                    Console.WriteLine($"{s.FirstName} {s.LastName}");
-                }
-
-                Console.WriteLine("\nTryck enter för att gå tillbaka.");
-                Console.ReadLine();
-                running = false;
-            }
-        }
-        // Method that prints all students in the school:
-        public static void PrintAllStudents(Labb4Context context)
-        {
-            Console.Clear();
-
-            var allStudents = context.Students
-                .Join(context.Classes,
-                    s => s.ClassId,
-                    c => c.ClassId,
-                    (s, c) => new
-                    {
-                        Class = c,
-                        Student = s
-                    })
-                .OrderBy(x => x.Class.ClassName)
-                .ToList();
-
-            foreach (var x in allStudents)
-            {
-                Console.WriteLine(
-                    $"{x.Class.ClassName}: {x.Student.FirstName} {x.Student.LastName}, Personnummer: {x.Student.PersonNumber}"
-                );
-            }
-            Console.WriteLine("\nTryck enter för att återgå <-");
-            Console.ReadKey();
-        }
-
         public static void TeachersBySection(Labb4Context context)
         {
             Console.Clear();
@@ -201,6 +135,5 @@ namespace Labb4RJ
             Console.WriteLine("\nTryck enter för att återgå <-");
             Console.ReadKey();
         }
-
     }
 }

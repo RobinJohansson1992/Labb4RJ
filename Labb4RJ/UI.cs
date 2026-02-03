@@ -14,15 +14,44 @@ namespace Labb4RJ
             Console.WriteLine("Välj klass från listan:\n");
 
         }
-        public static void PrintStudentsUI()
+        // Students-menu:
+        public static void StudentsUI(Labb4Context context)
         {
-            Console.WriteLine("Visa elever:\n");
+            Console.Clear();
+            Console.WriteLine("Elever:\n");
             Console.WriteLine("" +
-                "1. Förnamn stigande \n" +
-                "2. Förnamn fallande \n" +
-                "3. Efternamn stigande \n" +
-                "4. Efternamn fallande \n" +
+                "1. Elevinfo \n" +
+                "2. Elever per klass \n" +
+                "3. Visa betyg \n" +
+                "4. Sätt betyg på elev\n" +
+                "5. Hämta viktig info om elev med elev-ID\n" +
                 "\n0. Tillbaka <-");
+
+            int userInput;
+            while(!int.TryParse(Console.ReadLine(), out userInput) || userInput < 0 || userInput > 5)
+            {
+                Console.WriteLine("Du måste ange ett nummer från listan.");
+            }
+            switch (userInput)
+            {
+                case 1:
+                    StudentMethods.PrintAllStudents(context);
+                    break;
+                case 2:
+                    StaffMethods.PrintClasses(context);
+                    break;
+                case 3:
+                    //grades
+                    break;
+                case 4:
+                    //make grade
+                    break;
+                case 5:
+                    //important student info
+                    break;
+                case 0:
+                    return;
+            }
         }
         public static void ErrorMessage()
         {
@@ -37,6 +66,7 @@ namespace Labb4RJ
             Console.WriteLine("\nProgrammet avslutas...");
             Console.ReadKey();
         }
+        // Staff-menu:
         public static void StaffUI(Labb4Context context)
         {
             bool running = true;
@@ -61,15 +91,18 @@ namespace Labb4RJ
                 {
                     case 0:
                         running = false;
-                        break;
+                        return;
                     case 1:
-                        Functions.PrintStaff(context);
-                        break;
+                        StaffMethods.PrintStaff(context);
+                        return;
                     case 2:
-                        Functions.AddStaff(context);
+                        StaffMethods.TeachersBySection(context);
                         break;
                     case 3:
-                        Functions.RemoveStaff(context);
+                        StaffMethods.AddStaff(context);
+                        break;
+                    case 4:
+                        StaffMethods.RemoveStaff(context);
                         break;
                     default:
                         ErrorMessage();
@@ -78,6 +111,7 @@ namespace Labb4RJ
                 }
             }
         }
+        // Main-menu:
         public static void MainMenu()
         {
             bool running = true;
@@ -89,10 +123,9 @@ namespace Labb4RJ
                     Console.Clear();
                     Console.WriteLine("===|| Meny ||===\n");
                     Console.WriteLine("" +
-                        "1. Hämta alla elever \n" +
-                        "2. Hämta alla elever från en viss klass \n" +
-                        "3. Personal \n" +
-                        "4. Personal per avdelning\n" +
+                        "1. Elever \n" +
+                        "2. Personal \n" +
+                        "3. Kurser \n" +
                         "\n0. Avsluta");
 
                     int userInput;
@@ -103,16 +136,13 @@ namespace Labb4RJ
                     switch (userInput)
                     {
                         case 1:
-                            Functions.PrintAllStudents(context);
+                            StudentsUI(context);
                             break;
                         case 2:
-                            Functions.PrintClasses(context);
-                            break;
-                        case 3:
                             StaffUI(context);
                             break;
-                        case 4:
-                            Functions.TeachersBySection(context);
+                        case 3:
+                            // Course
                             break;
                         case 0:
                             ExitMessage();
