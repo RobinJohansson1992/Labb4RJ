@@ -99,22 +99,7 @@ namespace Labb4RJ
             }
             Console.ReadKey();
         }
-        // Method that prints all classes:
-        public static void PrintClasses(Labb4Context context)
-        {
-            Console.Clear();
-            UI.PrintClassesUI();
-            var allClasses = context.Classes
-                .OrderBy(c => c.ClassId)
-                .ToList();
-            foreach (var c in allClasses)
-            {
-                Console.WriteLine($"{c.ClassId}. {c.ClassName}");
-            }
-
-            Console.WriteLine($"\n0. Tillbaka <-");
-            StudentMethods.PrintStudentsByClass(context, allClasses);
-        }
+       
         public static void TeachersBySection(Labb4Context context)
         {
             Console.Clear();
