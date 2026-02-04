@@ -12,6 +12,15 @@ namespace Labb4RJ
         public static void PrintClassesUI()
         {
             Console.WriteLine("Välj klass från listan:\n");
+        }
+        public static void CheckInput(int userInput)
+        {
+            while (!int.TryParse(Console.ReadLine(), out userInput))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Felaktig inmatning.");
+                Console.ResetColor();
+            }
 
         }
         // Students-menu:
@@ -93,13 +102,13 @@ namespace Labb4RJ
                         running = false;
                         return;
                     case 1:
-                        StaffMethods.PrintStaff(context);
+                        StaffMethods.PrintStaff();
                         return;
                     case 2:
                         StaffMethods.TeachersBySection(context);
                         break;
                     case 3:
-                        StaffMethods.AddStaff(context);
+                        AddStaffUI(context);
                         break;
                     case 4:
                         StaffMethods.RemoveStaff(context);
@@ -110,6 +119,39 @@ namespace Labb4RJ
                         break;
                 }
             }
+        }
+        
+        public static void AddStaffUI(Labb4Context context)
+        {
+            Console.Clear();
+            var roles = context.Roles
+               .OrderBy(r => r.RoleId)
+               .ToList();
+            Console.WriteLine("Tillgängliga roller:\n");
+            foreach (var role in roles)
+            {
+                Console.WriteLine($"{role.RoleId}. {role.RoleName}");
+            }
+            Console.WriteLine("\nLägg till information om ny anställd:\n");
+            Console.Write("Namn: "); 
+            string name = Console.ReadLine();
+            Console.Write("Roll-ID: ");
+            int roleId = -1;
+            CheckInput(roleId);
+            Console.Write("Avdelnings-ID: ");
+            int sectionId = -1;
+            CheckInput(sectionId);
+            Console.Write("Anställdes år: ");
+            int yearHired = -1;
+            CheckInput(yearHired);
+            Console.Write("Månadslön: ");
+            int monthlySalary = -1;
+            CheckInput(monthlySalary);
+
+            StaffMethods.AddStaff(name, roleId, sectionId, yearHired, monthlySalary);
+
+            BackToMainMessage();
+            Console.ReadKey();
         }
         // Main-menu:
         public static void MainMenu()
