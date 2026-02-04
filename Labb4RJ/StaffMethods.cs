@@ -1,4 +1,6 @@
-﻿using Labb4RJ.Models;
+﻿using Azure;
+using Labb4RJ.Models;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,61 +47,71 @@ namespace Labb4RJ
             Console.ReadKey();
         }
         // Method that lets the user add staff to the staff-table:
-        public static void AddStaff(Labb4Context context)
+        public static void AddStaff(string name, int roleId, int sectionId, int yearHired, decimal monthlySalary)
         {
-            Console.Clear();
-            var roles = context.Roles
-               .OrderBy(r => r.RoleId)
-               .ToList();
-            Console.WriteLine("Tillgängliga roller:");
-            foreach (var role in roles)
+            var connectionString = DbConnection.GetConnectionString();
+            using (var connection = new SqlConnection(connectionString))
             {
-                Console.WriteLine($"{role.RoleId}. {role.RoleName}");
-            }
-            Console.WriteLine();
-            Console.Write("Ange roll-ID för ny anställd: ");
-            int roleId;
-            while (!int.TryParse(Console.ReadLine(), out roleId) || roleId > roles.Count || roleId < 1)
-            {
-                UI.ErrorMessage();
-            }
-            Console.Write("Ange namn för ny anställd: ");
-            string name = Console.ReadLine();
-
-            //Create new staff-member:
-            var newStaff = new Staff
-            {
-                Name = name,
-                RoleId = roleId,
-            };
-            context.Staff.Add(newStaff); //Add member to the table
-            context.SaveChanges(); //save to DB
-            Console.WriteLine($"{newStaff.Name} lades till i anställd-listan.");
-            Console.ReadKey();
-        }
-        // Method that prints all staff members in chosen order by user:
-        public static void PrintStaff(Labb4Context context)
-        {
-            Console.Clear();
-            // Join Staff and Role to get needed data:
-            var allStaff = context.Staff
-                .Join(
-                context.Roles,
-                s => s.RoleId,
-                r => r.RoleId,
-                (s, r) => new
+                string query = @"INSERT INTO Staff (name, roleId, sectionId, yearHired, monthlySalary)
+                             VALUES (@Name, @RoleId, @SectionId, @YearHired, @MonthlySalary)";
+                using (var command = new SqlCommand(query, connection))
                 {
-                    Roles = r,
-                    Staff = s
-                })
-                .OrderBy(s => s.Staff.StaffId).ToList();
-            foreach (var a in allStaff)
-            {
-                Console.WriteLine($"{a.Staff.StaffId}. {a.Staff.Name}: {a.Roles.RoleName}");
+                    command.Parameters.AddWithValue("@Name", name);
+                    command.Parameters.AddWithValue("@RoleId", roleId);
+                    command.Parameters.AddWithValue("@SectionId", sectionId);
+                    command.Parameters.AddWithValue("@YearHired", yearHired);
+                    command.Parameters.AddWithValue("@MonthlySalary", monthlySalary);
+
+                    // fail-safe try/catch:
+                    try
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        Console.WriteLine($"\n{name} lades till i anställd-listan.");
+                    }
+                    catch (Exception)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Ogiltig inmatning");
+                        Console.ResetColor();
+                    }
+                    connection.Close();
+                }
             }
-            Console.ReadKey();
         }
-       
+        // Method that prints all staff with info:
+        public static void PrintStaff()
+        {
+            Console.Clear();
+            // Get connection string from Connection class:
+            var connectionString = DbConnection.GetConnectionString();
+            string query = "SELECT s.Name, r.RoleName, s.YearHired FROM Staff s JOIN Roles r ON s.RoleId = r.RoleId";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        Console.WriteLine("Anställda:\n");
+
+                        while (reader.Read())
+                        {
+                            string name = reader.GetString(0);
+                            string role = reader.GetString(1);
+                            int yearHired = reader.GetInt32(2);
+
+                            Console.WriteLine($"{name} : {role}, anställd sedan {yearHired}");
+                        }
+                    }
+                }
+            }
+            UI.BackToMainMessage();
+            Console.ReadLine();
+        }
+
         public static void TeachersBySection(Labb4Context context)
         {
             Console.Clear();
