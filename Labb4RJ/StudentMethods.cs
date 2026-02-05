@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,11 +12,63 @@ namespace Labb4RJ
 {
     internal class StudentMethods
     {
-        // Method that shows grades for each student:
-        public static void GradesByStudent(Labb4Context context)
+        // Method that shows info about chosen student by ID:
+        public static void StudentInfoById()
         {
             Console.Clear();
-            Console.WriteLine("Ange student-ID för elev du vill se betyg för:");
+            Console.WriteLine("Ange student-ID för elev:");
+            Console.Write("\nStudent-ID: ");
+
+            int userInput = UI.CheckInput();
+            var connectionString = DbConnection.GetConnectionString();
+            string query = "studentInfo";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    connection.Open();
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@StudentId", userInput);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string firstName = reader.GetString(0);
+                            string lastName = reader.GetString(1);
+                            string personNumber = reader.GetString(2);
+                            string className = reader.GetString(3);
+                            string teacherName = reader.GetString(4);
+
+
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine($"{firstName} {lastName}s info: \n");
+                            Console.ResetColor();
+
+
+                            Console.WriteLine($"Personnummer: {personNumber}");
+                            Console.WriteLine($"Klass: {className}");
+                            Console.WriteLine($"Lärare: {teacherName}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Ingen elev hittades med ID {userInput}");
+                        }
+                    }
+                    connection.Close();
+                }
+            }
+            UI.BackToMainMessage();
+            Console.ReadLine();
+        }
+        // Method that shows grades for each student:
+        public static void GradesByStudent()
+        {
+            Console.Clear();
+            Console.WriteLine("Ange student-ID för elev:");
+            Console.Write("\nStudent-ID: ");
             int userInput = UI.CheckInput();
 
             // Get connection string from Connection class:

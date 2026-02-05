@@ -60,13 +60,13 @@ namespace Labb4RJ
                     StudentMethods.PrintClasses(context);
                     break;
                 case 3:
-                    StudentMethods.GradesByStudent(context);
+                    StudentMethods.GradesByStudent();
                     break;
                 case 4:
                     //make grade
                     break;
                 case 5:
-                    //important student info
+                    StudentMethods.StudentInfoById();
                     break;
                 case 0:
                     return;
