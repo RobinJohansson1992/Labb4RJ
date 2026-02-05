@@ -52,7 +52,9 @@ namespace Labb4RJ
                             if (!header)
                             {
                                 Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
                                 Console.WriteLine($"{studentId}. {firstName} {lastName}s betyg: \n");
+                                Console.ResetColor();
                                 header = true;
                             }
                             Console.WriteLine($"{subjectName}: [{grade}] || {date:dd MMM yyyy} || av: {teacherName}\n");
@@ -97,8 +99,9 @@ namespace Labb4RJ
                 {
                     Console.WriteLine($"{s.FirstName} {s.LastName}");
                 }
-
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("\nTryck enter för att gå tillbaka.");
+                Console.ResetColor();
                 Console.ReadLine();
                 running = false;
             }
@@ -141,8 +144,9 @@ namespace Labb4RJ
             {
                 Console.WriteLine($"{c.ClassId}. {c.ClassName}");
             }
-
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"\n0. Tillbaka <-");
+            Console.ResetColor();
             StudentMethods.PrintStudentsByClass(context, allClasses);
         }
 
