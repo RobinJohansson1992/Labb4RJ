@@ -1,14 +1,69 @@
 ﻿using Labb4RJ.Models;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Labb4RJ
 {
     internal class StudentMethods
     {
+        // Method that shows grades for each student:
+        public static void GradesByStudent(Labb4Context context)
+        {
+            Console.Clear();
+            Console.WriteLine("Ange student-ID för elev du vill se betyg för:");
+            int userInput = UI.CheckInput();
+
+            // Get connection string from Connection class:
+            var connectionString = DbConnection.GetConnectionString();
+            string query = @"
+                     SELECT s.StudentId, s.FirstName, s.LastName, su.SubjectName,
+                       g.Grade, g.GradeDate, st.Name
+                         FROM Students s
+                         JOIN Grades g ON g.StudentId = s.StudentId
+                          JOIN Subjects su ON su.SubjectId = g.SubjectId
+                           JOIN Staff st ON st.StaffId = g.TeacherId
+                              WHERE st.RoleID = 1 AND s.StudentId = @StudentId";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    connection.Open();
+                    command.Parameters.AddWithValue("@StudentId", userInput);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        bool header = false;
+
+                        while (reader.Read())
+                        {
+                            int studentId = reader.GetInt32(0);
+                            string firstName = reader.GetString(1);
+                            string lastName = reader.GetString(2);
+                            string subjectName = reader.GetString(3);
+                            string grade = reader.GetString(4);
+                            DateTime date = reader.GetDateTime(5);
+                            string teacherName = reader.GetString(6);
+                            if (!header)
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"{studentId}. {firstName} {lastName}s betyg: \n");
+                                header = true;
+                            }
+                            Console.WriteLine($"{subjectName}: [{grade}] || {date:dd MMM yyyy} || av: {teacherName}\n");
+                        }
+                    }
+                    connection.Close();
+                }
+            }
+            UI.BackToMainMessage();
+            Console.ReadLine();
+        }
         // Method that prints all students by class:
         public static void PrintStudentsByClass(Labb4Context context, List<Class> allClasses)
         {

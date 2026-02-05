@@ -13,14 +13,16 @@ namespace Labb4RJ
         {
             Console.WriteLine("Välj klass från listan:\n");
         }
-        public static void CheckInput(int userInput)
+        public static int CheckInput()
         {
+            int userInput;
             while (!int.TryParse(Console.ReadLine(), out userInput))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Felaktig inmatning.");
                 Console.ResetColor();
             }
+            return userInput;
 
         }
         // Students-menu:
@@ -50,7 +52,7 @@ namespace Labb4RJ
                     StudentMethods.PrintClasses(context);
                     break;
                 case 3:
-                    //grades
+                    StudentMethods.GradesByStudent(context);
                     break;
                 case 4:
                     //make grade
@@ -136,17 +138,13 @@ namespace Labb4RJ
             Console.Write("Namn: "); 
             string name = Console.ReadLine();
             Console.Write("Roll-ID: ");
-            int roleId = -1;
-            CheckInput(roleId);
+            int roleId = CheckInput();
             Console.Write("Avdelnings-ID: ");
-            int sectionId = -1;
-            CheckInput(sectionId);
+            int sectionId = CheckInput();
             Console.Write("Anställdes år: ");
-            int yearHired = -1;
-            CheckInput(yearHired);
+            int yearHired = CheckInput();
             Console.Write("Månadslön: ");
-            int monthlySalary = -1;
-            CheckInput(monthlySalary);
+            int monthlySalary = CheckInput();
 
             StaffMethods.AddStaff(name, roleId, sectionId, yearHired, monthlySalary);
 
