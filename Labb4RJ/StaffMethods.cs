@@ -95,7 +95,9 @@ namespace Labb4RJ
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.WriteLine("Anställda:\n");
+                        Console.ResetColor();
 
                         while (reader.Read())
                         {
@@ -124,12 +126,17 @@ namespace Labb4RJ
                 })
                 .OrderBy(x => x.SectionName)
                 .ToList();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Antal anställda per avdelning:");
+            Console.ResetColor();
             foreach (var item in result)
             {
                 Console.WriteLine();
                 Console.WriteLine($"{item.SectionName} - {item.StaffCount} anställda");
             }
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("\nTryck enter för att återgå <-");
+            Console.ResetColor();
             Console.ReadKey();
         }
     }

@@ -9,11 +9,13 @@ namespace Labb4RJ
 {
     internal class SubjectMethods
     {
-        // Method that shows all active subjects:
+        // Method that shows all active subjects (subjects with students):
         public static void ActiveSubjects(Labb4Context context)
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("===|| Aktiva kurser ||===\n");
+            Console.ResetColor();
 
             var allSubjects = context.Subjects
                 .Join(context.Grades,
