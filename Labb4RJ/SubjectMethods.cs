@@ -14,27 +14,37 @@ namespace Labb4RJ
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("===|| Aktiva kurser ||===\n");
+            Console.WriteLine("===|| Kurser ||===\n");
             Console.ResetColor();
 
             var allSubjects = context.Subjects
-                .Join(context.Grades,
-                s => s.SubjectId,
-                g => g.SubjectId,
-                (s,g) => new
-                {
-                    s.SubjectId, s.SubjectName, g.StudentId
-                })
-                .GroupBy(x => new {x.SubjectId, x.SubjectName})
-                .Select(g => new
-                {
-                    g.Key.SubjectId,
-                    g.Key.SubjectName,
-                    StudentCount = g.Count()
-                });
+                 .GroupJoin(
+                  context.Grades,
+                  s => s.SubjectId,
+                  g => g.SubjectId,
+                   (s, grades) => new
+                   {
+                       s.SubjectId,
+                       s.SubjectName,
+                       StudentCount = grades.Count()
+                   });
             foreach (var a in allSubjects)
             {
-                Console.WriteLine($"\n{a.SubjectId}. {a.SubjectName} ({a.StudentCount} elever)");
+                if (a.StudentCount > 0)
+                {
+                    Console.Write($"\n{a.SubjectId}. {a.SubjectName} ({a.StudentCount} elever) - ");
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("AKTIV");
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.Write($"\n{a.SubjectId}. {a.SubjectName} ({a.StudentCount} elever) - ");
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("INAKTIV");
+                    Console.ResetColor();
+
+                }
             }
             UIMessages.BackMessage();
         }

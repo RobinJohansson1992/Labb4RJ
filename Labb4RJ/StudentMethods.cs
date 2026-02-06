@@ -42,11 +42,12 @@ namespace Labb4RJ
                     Console.WriteLine($"\nNytt betyg registrerades för student-Id {studentId}.");
                     Console.ResetColor();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     tran.Rollback();
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine("Ogiltig inmatning.");
+                    Console.WriteLine("Ogiltig inmatning.\n");
+                    Console.WriteLine($"'{ex.Message}'");
                     Console.ResetColor();
                 }
                 }
@@ -60,11 +61,11 @@ namespace Labb4RJ
 
             int userInput = UIMessages.CheckInput();
             var connectionString = DbConnection.GetConnectionString();
-            string query = "studentInfo";
+            string procedure = "studentInfo";
 
             using (var connection = new SqlConnection(connectionString))
             {
-                using (var command = new SqlCommand(query, connection))
+                using (var command = new SqlCommand(procedure, connection))
                 {
                     connection.Open();
                     command.CommandType = CommandType.StoredProcedure;
@@ -212,9 +213,18 @@ namespace Labb4RJ
 
             foreach (var x in allStudents)
             {
-                Console.WriteLine(
-                    $"{x.Student.StudentId}. {x.Student.FirstName} {x.Student.LastName}, Personnummer: {x.Student.PersonNumber} Klass: {x.Class.ClassName}"
-                );
+                Console.Write($"{x.Student.StudentId}. ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write($"{x.Student.FirstName} {x.Student.LastName} ");
+                Console.ResetColor();
+                Console.Write($"\tPersonnummer: ");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write(x.Student.PersonNumber);
+                Console.ResetColor();
+                Console.Write($" \tKlass: ");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write($"{x.Class.ClassName}\n");
+                Console.ResetColor();
             }
             UIMessages.BackMessage();
         }
