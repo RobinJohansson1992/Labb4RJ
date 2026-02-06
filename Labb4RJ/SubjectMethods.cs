@@ -36,9 +36,7 @@ namespace Labb4RJ
             {
                 Console.WriteLine($"\n{a.SubjectId}. {a.SubjectName} ({a.StudentCount} elever)");
             }
-            UI.BackToMainMessage();
-            Console.ReadKey();
-
+            UIMessages.BackMessage();
         }
     }
 }

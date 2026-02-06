@@ -12,6 +12,45 @@ namespace Labb4RJ
 {
     internal class StudentMethods
     {
+        // Method for grading students using transactions:
+        public static void GradeStudentWithId(int studentId, int subjectId, int teacherId, string grade)
+        {
+            var connectionString = DbConnection.GetConnectionString();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlTransaction tran = connection.BeginTransaction();
+                try
+                {
+                    string query = @"
+                INSERT INTO Grades (Grade, GradeDate, StudentId, SubjectId, TeacherId)
+                VALUES (@Grade, @GradeDate, @StudentId, @SubjectId, @TeacherId);";
+
+                    using (SqlCommand command = new SqlCommand(query, connection, tran))
+                    {
+                        command.Parameters.AddWithValue("@Grade", grade);
+                        command.Parameters.AddWithValue("@GradeDate", DateTime.Now);
+                        command.Parameters.AddWithValue("@StudentId", studentId);
+                        command.Parameters.AddWithValue("@SubjectId", subjectId);
+                        command.Parameters.AddWithValue("@TeacherId", teacherId);
+
+                        command.ExecuteNonQuery();
+                    }
+                    tran.Commit();
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine($"\nNytt betyg registrerades för student-Id {studentId}.");
+                    Console.ResetColor();
+                }
+                catch (Exception)
+                {
+                    tran.Rollback();
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Ogiltig inmatning.");
+                    Console.ResetColor();
+                }
+                }
+        }
         // Method that shows info about chosen student by ID:
         public static void StudentInfoById()
         {
@@ -19,7 +58,7 @@ namespace Labb4RJ
             Console.WriteLine("Ange student-ID för elev:");
             Console.Write("\nStudent-ID: ");
 
-            int userInput = UI.CheckInput();
+            int userInput = UIMessages.CheckInput();
             var connectionString = DbConnection.GetConnectionString();
             string query = "studentInfo";
 
@@ -60,8 +99,7 @@ namespace Labb4RJ
                     connection.Close();
                 }
             }
-            UI.BackToMainMessage();
-            Console.ReadLine();
+            UIMessages.BackMessage();
         }
         // Method that shows grades for each student:
         public static void GradesByStudent()
@@ -69,7 +107,7 @@ namespace Labb4RJ
             Console.Clear();
             Console.WriteLine("Ange student-ID för elev:");
             Console.Write("\nStudent-ID: ");
-            int userInput = UI.CheckInput();
+            int userInput = UIMessages.CheckInput();
 
             // Get connection string from Connection class:
             var connectionString = DbConnection.GetConnectionString();
@@ -116,8 +154,7 @@ namespace Labb4RJ
                     connection.Close();
                 }
             }
-            UI.BackToMainMessage();
-            Console.ReadLine();
+            UIMessages.BackMessage();
         }
         // Method that prints all students by class:
         public static void PrintStudentsByClass(Labb4Context context, List<Class> allClasses)
@@ -129,7 +166,7 @@ namespace Labb4RJ
                 int userInput;
                 if (!int.TryParse(Console.ReadLine(), out userInput))
                 {
-                    UI.ErrorMessage();
+                    UIMessages.ErrorMessage();
                     Console.ReadKey();
                     continue;
                 }
@@ -140,7 +177,7 @@ namespace Labb4RJ
                 }
                 if (userInput < 1 || userInput > allClasses.Count)
                 {
-                    UI.ErrorMessage();
+                    UIMessages.ErrorMessage();
                     Console.ReadKey();
                     continue;
                 }
@@ -152,10 +189,7 @@ namespace Labb4RJ
                 {
                     Console.WriteLine($"{s.FirstName} {s.LastName}");
                 }
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("\nTryck enter för att gå tillbaka.");
-                Console.ResetColor();
-                Console.ReadLine();
+                UIMessages.BackMessage();
                 running = false;
             }
         }
@@ -182,8 +216,7 @@ namespace Labb4RJ
                     $"{x.Student.StudentId}. {x.Student.FirstName} {x.Student.LastName}, Personnummer: {x.Student.PersonNumber} Klass: {x.Class.ClassName}"
                 );
             }
-            UI.BackToMainMessage();
-            Console.ReadKey();
+            UIMessages.BackMessage();
         }
         // Method that prints all classes:
         public static void PrintClasses(Labb4Context context)
@@ -202,8 +235,5 @@ namespace Labb4RJ
             Console.ResetColor();
             StudentMethods.PrintStudentsByClass(context, allClasses);
         }
-
-
-
     }
 }

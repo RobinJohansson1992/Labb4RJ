@@ -9,89 +9,100 @@ namespace Labb4RJ
 {
     internal class UI
     {
+        // UI for GradeStudentWithId-method:
+        public static void GradeStudentWithIdUI()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Sätt betyg för elev:\n");
+            Console.ResetColor();
+
+            Console.Write("\nStudent-ID: ");
+            int studentId = UIMessages.CheckInput();
+            Console.Write("\nÄmnes-ID: ");
+            int subjectId = UIMessages.CheckInput();
+            Console.Write("\nLärar-ID: ");
+            int teacherId = UIMessages.CheckInput();
+            string grade = string.Empty;
+            bool gradeInput = false;
+            while (!gradeInput)
+            {
+                Console.Write("\nBetyg (A–F): ");
+                grade = Console.ReadLine()?.Trim().ToUpper();
+
+                if (!string.IsNullOrEmpty(grade) && grade.Length == 1 && grade[0] >= 'A' && grade[0] <= 'F')
+                {
+                    gradeInput = true;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Felaktigt betyg. Ange en bokstav mellan A och F.");
+                    Console.ResetColor();
+                }
+            }
+            Console.WriteLine();
+            StudentMethods.GradeStudentWithId(studentId, subjectId, teacherId, grade);
+            UIMessages.BackMessage();
+        }
         public static void PrintClassesUI()
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Välj klass från listan:\n");
             Console.ResetColor();
         }
-        public static int CheckInput()
-        {
-            int userInput;
-            while (!int.TryParse(Console.ReadLine(), out userInput))
-            {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("Felaktig inmatning.");
-                Console.ResetColor();
-            }
-            return userInput;
-
-        }
-        // Students-menu:
+       
+        // Under-menu: Students:
         public static void StudentsUI(Labb4Context context)
         {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("===|| Elever ||===\n");
-            Console.ResetColor();
-            Console.WriteLine("" +
-                "1. Elevinfo \n" +
-                "2. Elever per klass \n" +
-                "3. Visa betyg \n" +
-                "4. Sätt betyg på elev\n" +
-                "5. Hämta viktig info om elev med elev-ID\n");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("0. Tillbaka <-");
-            Console.ResetColor();
-
-            int userInput;
-            while (!int.TryParse(Console.ReadLine(), out userInput) || userInput < 0 || userInput > 5)
+            bool running = true;
+            while (running)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("Du måste ange ett nummer från listan.");
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("===|| Elever ||===\n");
                 Console.ResetColor();
+                Console.WriteLine("" +
+                    "1. Elevinfo \n" +
+                    "2. Elever per klass \n" +
+                    "3. Visa betyg \n" +
+                    "4. Sätt betyg på elev\n" +
+                    "5. Hämta viktig info om elev med elev-ID\n");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("0. Tillbaka <-");
+                Console.ResetColor();
+
+                int userInput;
+                while (!int.TryParse(Console.ReadLine(), out userInput) || userInput < 0 || userInput > 5)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Du måste ange ett nummer från listan.");
+                    Console.ResetColor();
+                }
+                switch (userInput)
+                {
+                    case 1:
+                        StudentMethods.PrintAllStudents(context);
+                        break;
+                    case 2:
+                        StudentMethods.PrintClasses(context);
+                        break;
+                    case 3:
+                        StudentMethods.GradesByStudent();
+                        break;
+                    case 4:
+                        GradeStudentWithIdUI();
+                        break;
+                    case 5:
+                        StudentMethods.StudentInfoById();
+                        break;
+                    case 0:
+                        running = false;
+                        return;
+                }
             }
-            switch (userInput)
-            {
-                case 1:
-                    StudentMethods.PrintAllStudents(context);
-                    break;
-                case 2:
-                    StudentMethods.PrintClasses(context);
-                    break;
-                case 3:
-                    StudentMethods.GradesByStudent();
-                    break;
-                case 4:
-                    //make grade
-                    break;
-                case 5:
-                    StudentMethods.StudentInfoById();
-                    break;
-                case 0:
-                    return;
-            }
         }
-        public static void ErrorMessage()
-        {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Du måste välja ett nummer från listan.");
-            Console.ResetColor();
-        }
-        public static void BackToMainMessage()
-        {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("\nTryck enter för att gå tillbaka <-");
-            Console.ResetColor();
-        }
-        public static void ExitMessage()
-        {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("\nProgrammet avslutas...");
-            Console.ResetColor();
-            Console.ReadKey();
-        }
-        // Staff-menu:
+        // Under-menu: Staff:
         public static void StaffUI(Labb4Context context)
         {
             bool running = true;
@@ -112,7 +123,7 @@ namespace Labb4RJ
                 int userInput;
                 while (!int.TryParse(Console.ReadLine(), out userInput))
                 {
-                    ErrorMessage();
+                    UIMessages.ErrorMessage();
                     Console.ReadKey();
                     return;
                 }
@@ -123,7 +134,7 @@ namespace Labb4RJ
                         return;
                     case 1:
                         StaffMethods.PrintStaff();
-                        return;
+                        break;
                     case 2:
                         StaffMethods.TeachersBySection(context);
                         break;
@@ -134,13 +145,13 @@ namespace Labb4RJ
                         StaffMethods.RemoveStaff(context);
                         break;
                     default:
-                        ErrorMessage();
+                        UIMessages.ErrorMessage();
                         Console.ReadKey();
                         break;
                 }
             }
         }
-
+        // UI for AddStaff-method:
         public static void AddStaffUI(Labb4Context context)
         {
             Console.Clear();
@@ -158,49 +169,53 @@ namespace Labb4RJ
             Console.Write("Namn: ");
             string name = Console.ReadLine();
             Console.Write("Roll-ID: ");
-            int roleId = CheckInput();
+            int roleId = UIMessages.CheckInput();
             Console.Write("Avdelnings-ID: ");
-            int sectionId = CheckInput();
+            int sectionId = UIMessages.CheckInput();
             Console.Write("Anställdes år: ");
-            int yearHired = CheckInput();
+            int yearHired = UIMessages.CheckInput();
             Console.Write("Månadslön: ");
-            int monthlySalary = CheckInput();
+            int monthlySalary = UIMessages.CheckInput();
 
             StaffMethods.AddStaff(name, roleId, sectionId, yearHired, monthlySalary);
 
-            BackToMainMessage();
+            UIMessages.BackMessage();
             Console.ReadKey();
         }
+        // Under-menu: Section:
         public static void SectionMenu()
         {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("===|| Avdelningar ||===\n");
-            Console.ResetColor();
-            Console.WriteLine("" +
-                "1. Total löneutbetalning / avdelning \n" +
-                "2. Medellön / avdelning \n");
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("0. Tillbaka <-");
-            Console.ResetColor();
-            int userInput;
-            while (!int.TryParse(Console.ReadLine(), out userInput) || userInput < 0 || userInput > 2)
+            bool running = true;
+            while (running)
             {
-                UI.ErrorMessage();
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("===|| Avdelningar ||===\n");
+                Console.ResetColor();
+                Console.WriteLine("" +
+                    "1. Total löneutbetalning / avdelning \n" +
+                    "2. Medellön / avdelning \n");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("0. Tillbaka <-");
+                Console.ResetColor();
+                int userInput;
+                while (!int.TryParse(Console.ReadLine(), out userInput) || userInput < 0 || userInput > 2)
+                {
+                    UIMessages.ErrorMessage();
+                }
+                switch (userInput)
+                {
+                    case 1:
+                        SectionMethods.TotalSalaryBySection();
+                        break;
+                    case 2:
+                        SectionMethods.AverageSalaryBySection();
+                        break;
+                    case 0:
+                        running = false;
+                        break;
+                }
             }
-            switch (userInput)
-            {
-                case 1:
-                    SectionMethods.TotalSalaryBySection();
-                    break;
-                case 2:
-                    SectionMethods.AverageSalaryBySection();
-                    break;
-                case 0:
-                    break;
-
-            }
-
         }
         // Main-menu:
         public static void MainMenu()
@@ -227,7 +242,7 @@ namespace Labb4RJ
                     int userInput;
                     while (!int.TryParse(Console.ReadLine(), out userInput) || userInput < 0 || userInput > 4)
                     {
-                        UI.ErrorMessage();
+                        UIMessages.ErrorMessage();
                     }
                     switch (userInput)
                     {
@@ -244,7 +259,7 @@ namespace Labb4RJ
                             SectionMenu();
                             break;
                         case 0:
-                            ExitMessage();
+                            UIMessages.ExitMessage();
                             running = false;
                             break;
                     }
