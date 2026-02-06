@@ -38,8 +38,7 @@ namespace Labb4RJ
                 }
                 connection.Close();
             }
-            UI.BackToMainMessage();
-            Console.ReadKey();
+            UIMessages.BackMessage();
         }
         public static void TotalSalaryBySection()
         {
@@ -70,8 +69,7 @@ namespace Labb4RJ
                 }
                 connection.Close();
             }
-            UI.BackToMainMessage();
-            Console.ReadKey();
+            UIMessages.BackMessage();
         }
     }
 }

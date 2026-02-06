@@ -35,7 +35,7 @@ namespace Labb4RJ
             int staffId;
             while (!int.TryParse(Console.ReadLine(), out staffId) || !allStaff.Any(s => s.Staff.StaffId == staffId))
             {
-                UI.ErrorMessage();
+                UIMessages.ErrorMessage();
             }
 
             var staffToRemove = context.Staff.First(s => s.StaffId == staffId);
@@ -110,8 +110,7 @@ namespace Labb4RJ
                     }
                 }
             }
-            UI.BackToMainMessage();
-            Console.ReadLine();
+            UIMessages.BackMessage();
         }
 
         public static void TeachersBySection(Labb4Context context)
@@ -134,10 +133,8 @@ namespace Labb4RJ
                 Console.WriteLine();
                 Console.WriteLine($"{item.SectionName} - {item.StaffCount} anställda");
             }
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("\nTryck enter för att återgå <-");
-            Console.ResetColor();
-            Console.ReadKey();
+
+            UIMessages.BackMessage();
         }
     }
 }
