@@ -11,6 +11,7 @@ namespace Labb4RJ
 {
     internal class StaffMethods
     {
+        // Method that removes chosen staffmember by user:
         public static void RemoveStaff(Labb4Context context)
         {
             Console.Clear();
@@ -69,10 +70,11 @@ namespace Labb4RJ
                         command.ExecuteNonQuery();
                         Console.WriteLine($"\n{name} lades till i anställd-listan.");
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Ogiltig inmatning");
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("Ogiltig inmatning.\n");
+                        Console.WriteLine($"'{ex.Message}'");
                         Console.ResetColor();
                     }
                     connection.Close();
@@ -105,14 +107,17 @@ namespace Labb4RJ
                             string role = reader.GetString(1);
                             int yearHired = reader.GetInt32(2);
 
-                            Console.WriteLine($"{name} : {role}, anställd sedan {yearHired}");
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.Write($"{name}");
+                            Console.ResetColor();
+                            Console.WriteLine($" - {role}, anställd sedan {yearHired}");
                         }
                     }
                 }
             }
             UIMessages.BackMessage();
         }
-
+        // Method that shows how many techers work in each section:
         public static void TeachersBySection(Labb4Context context)
         {
             Console.Clear();

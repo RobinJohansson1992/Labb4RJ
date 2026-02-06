@@ -9,6 +9,7 @@ namespace Labb4RJ
 {
     internal class SectionMethods
     {
+        // Method that shows the total average salary for each section:
         public static void AverageSalaryBySection()
         {
             Console.Clear();
@@ -40,6 +41,7 @@ namespace Labb4RJ
             }
             UIMessages.BackMessage();
         }
+        // Method that shows the total salary paid by each section each month:
         public static void TotalSalaryBySection()
         {
             Console.Clear();
