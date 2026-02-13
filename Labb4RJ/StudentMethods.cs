@@ -195,55 +195,61 @@ namespace Labb4RJ
             }
         }
         // Method that prints all students in the school:
-        public static void PrintAllStudents(Labb4Context context)
+        public static void PrintAllStudents()
         {
-            Console.Clear();
-
-            var allStudents = context.Students
-                .Join(context.Classes,
-                    s => s.ClassId,
-                    c => c.ClassId,
-                    (s, c) => new
-                    {
-                        Class = c,
-                        Student = s
-                    })
-                .OrderBy(x => x.Student.StudentId)
-                .ToList();
-
-            foreach (var x in allStudents)
+            using (var context = new Labb4Context())
             {
-                Console.Write($"{x.Student.StudentId}. ");
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.Write($"{x.Student.FirstName} {x.Student.LastName} ");
-                Console.ResetColor();
-                Console.Write($"\tPersonnummer: ");
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write(x.Student.PersonNumber);
-                Console.ResetColor();
-                Console.Write($" \tKlass: ");
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write($"{x.Class.ClassName}\n");
-                Console.ResetColor();
+                Console.Clear();
+
+                var allStudents = context.Students
+                    .Join(context.Classes,
+                        s => s.ClassId,
+                        c => c.ClassId,
+                        (s, c) => new
+                        {
+                            Class = c,
+                            Student = s
+                        })
+                    .OrderBy(x => x.Student.StudentId)
+                    .ToList();
+
+                foreach (var x in allStudents)
+                {
+                    Console.Write($"{x.Student.StudentId}. ");
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.Write($"{x.Student.FirstName} {x.Student.LastName} ");
+                    Console.ResetColor();
+                    Console.Write($"\tPersonnummer: ");
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write(x.Student.PersonNumber);
+                    Console.ResetColor();
+                    Console.Write($" \tKlass: ");
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write($"{x.Class.ClassName}\n");
+                    Console.ResetColor();
+                }
+                UIMessages.BackMessage();
             }
-            UIMessages.BackMessage();
         }
         // Method that prints all classes:
-        public static void PrintClasses(Labb4Context context)
+        public static void PrintClasses()
         {
-            Console.Clear();
-            UI.PrintClassesUI();
-            var allClasses = context.Classes
-                .OrderBy(c => c.ClassId)
-                .ToList();
-            foreach (var c in allClasses)
+            using (var context = new Labb4Context())
             {
-                Console.WriteLine($"{c.ClassId}. {c.ClassName}");
+                Console.Clear();
+                UI.PrintClassesUI();
+                var allClasses = context.Classes
+                    .OrderBy(c => c.ClassId)
+                    .ToList();
+                foreach (var c in allClasses)
+                {
+                    Console.WriteLine($"{c.ClassId}. {c.ClassName}");
+                }
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"\n0. Tillbaka <-");
+                Console.ResetColor();
+                StudentMethods.PrintStudentsByClass(context, allClasses);
             }
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine($"\n0. Tillbaka <-");
-            Console.ResetColor();
-            StudentMethods.PrintStudentsByClass(context, allClasses);
         }
     }
 }
