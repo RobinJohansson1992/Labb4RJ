@@ -12,40 +12,43 @@ namespace Labb4RJ
     internal class StaffMethods
     {
         // Method that removes chosen staffmember by user:
-        public static void RemoveStaff(Labb4Context context)
+        public static void RemoveStaff()
         {
-            Console.Clear();
-            var allStaff = context.Staff
-                .Join(
-                context.Roles,
-                s => s.RoleId,
-                r => r.RoleId,
-                (s, r) => new
+            using (var context = new Labb4Context())
+            {
+                Console.Clear();
+                var allStaff = context.Staff
+                    .Join(
+                    context.Roles,
+                    s => s.RoleId,
+                    r => r.RoleId,
+                    (s, r) => new
+                    {
+                        Roles = r,
+                        Staff = s
+                    }
+                    )
+                    .OrderBy(s => s.Staff.StaffId)
+                    .ToList();
+                foreach (var a in allStaff)
                 {
-                    Roles = r,
-                    Staff = s
+                    Console.WriteLine($"{a.Staff.StaffId}. {a.Staff.Name}: {a.Roles.RoleName}");
                 }
-                )
-                .OrderBy(s => s.Staff.StaffId)
-                .ToList();
-            foreach (var a in allStaff)
-            {
-                Console.WriteLine($"{a.Staff.StaffId}. {a.Staff.Name}: {a.Roles.RoleName}");
+                Console.Write("\nAnge anställd-ID på den anställda du vill ta bort: ");
+                int staffId;
+                while (!int.TryParse(Console.ReadLine(), out staffId) || !allStaff.Any(s => s.Staff.StaffId == staffId))
+                {
+                    UIMessages.ErrorMessage();
+                }
+
+                var staffToRemove = context.Staff.First(s => s.StaffId == staffId);
+
+                context.Staff.Remove(staffToRemove);
+                context.SaveChanges();
+
+                Console.WriteLine($"{staffToRemove.Name} togs bort från anställd-listan.");
+                Console.ReadKey();
             }
-            Console.Write("\nAnge anställd-ID på den anställda du vill ta bort: ");
-            int staffId;
-            while (!int.TryParse(Console.ReadLine(), out staffId) || !allStaff.Any(s => s.Staff.StaffId == staffId))
-            {
-                UIMessages.ErrorMessage();
-            }
-
-            var staffToRemove = context.Staff.First(s => s.StaffId == staffId);
-
-            context.Staff.Remove(staffToRemove);
-            context.SaveChanges();
-
-            Console.WriteLine($"{staffToRemove.Name} togs bort från anställd-listan.");
-            Console.ReadKey();
         }
         // Method that lets the user add staff to the staff-table:
         public static void AddStaff(string name, int roleId, int sectionId, int yearHired, decimal monthlySalary)
@@ -87,7 +90,7 @@ namespace Labb4RJ
             Console.Clear();
             // Get connection string from Connection class:
             var connectionString = DbConnection.GetConnectionString();
-            string query = "SELECT s.Name, r.RoleName, s.YearHired FROM Staff s JOIN Roles r ON s.RoleId = r.RoleId";
+            string query = "SELECT s.staffId, s.Name, r.RoleName, s.YearHired FROM Staff s JOIN Roles r ON s.RoleId = r.RoleId";
 
             using (var connection = new SqlConnection(connectionString))
             {
@@ -103,10 +106,13 @@ namespace Labb4RJ
 
                         while (reader.Read())
                         {
-                            string name = reader.GetString(0);
-                            string role = reader.GetString(1);
-                            int yearHired = reader.GetInt32(2);
 
+                            int staffId = reader.GetInt32(0);
+                            string name = reader.GetString(1);
+                            string role = reader.GetString(2);
+                            int yearHired = reader.GetInt32(3);
+
+                            Console.Write($"{staffId}. ");
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
                             Console.Write($"{name}");
                             Console.ResetColor();
@@ -118,28 +124,31 @@ namespace Labb4RJ
             UIMessages.BackMessage();
         }
         // Method that shows how many techers work in each section:
-        public static void TeachersBySection(Labb4Context context)
+        public static void TeachersBySection()
         {
-            Console.Clear();
-            var result = context.Staff
-                .GroupBy(s => s.Section)
-                .Select(g => new
-                {
-                    SectionName = g.Key.Name,
-                    StaffCount = g.Count()
-                })
-                .OrderBy(x => x.SectionName)
-                .ToList();
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Antal anställda per avdelning:");
-            Console.ResetColor();
-            foreach (var item in result)
+            using (var context = new Labb4Context())
             {
-                Console.WriteLine();
-                Console.WriteLine($"{item.SectionName} - {item.StaffCount} anställda");
-            }
+                Console.Clear();
+                var result = context.Staff
+                    .GroupBy(s => s.Section)
+                    .Select(g => new
+                    {
+                        SectionName = g.Key.Name,
+                        StaffCount = g.Count()
+                    })
+                    .OrderBy(x => x.SectionName)
+                    .ToList();
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Antal anställda per avdelning:");
+                Console.ResetColor();
+                foreach (var item in result)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"{item.SectionName} - {item.StaffCount} anställda");
+                }
 
-            UIMessages.BackMessage();
+                UIMessages.BackMessage();
+            }
         }
     }
 }
